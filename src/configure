@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
-$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+$:.unshift  '/opt/gomicro/hookit/vendor/bundle'
 require 'bundler/setup'
 
 # load hookit/setup to bootstrap hookit and import the dsl
@@ -33,27 +33,27 @@ if payload[:platform] != 'local'
   end
 
   # Create some ssh host keys
-  execute "ssh-keygen -f /opt/gonano/etc/ssh/ssh_host_rsa_key -N '' -t rsa" do
-    not_if { ::File.exists? '/opt/gonano/etc/ssh/ssh_host_rsa_key' }
+  execute "ssh-keygen -f /opt/gomicro/etc/ssh/ssh_host_rsa_key -N '' -t rsa" do
+    not_if { ::File.exists? '/opt/gomicro/etc/ssh/ssh_host_rsa_key' }
   end
 
-  execute "ssh-keygen -f /opt/gonano/etc/ssh/ssh_host_dsa_key -N '' -t dsa" do
-    not_if { ::File.exists? '/opt/gonano/etc/ssh/ssh_host_dsa_key' }
+  execute "ssh-keygen -f /opt/gomicro/etc/ssh/ssh_host_dsa_key -N '' -t dsa" do
+    not_if { ::File.exists? '/opt/gomicro/etc/ssh/ssh_host_dsa_key' }
   end
 
-  execute "ssh-keygen -f /opt/gonano/etc/ssh/ssh_host_ecdsa_key -N '' -t ecdsa" do
-    not_if { ::File.exists? '/opt/gonano/etc/ssh/ssh_host_ecdsa_key' }
+  execute "ssh-keygen -f /opt/gomicro/etc/ssh/ssh_host_ecdsa_key -N '' -t ecdsa" do
+    not_if { ::File.exists? '/opt/gomicro/etc/ssh/ssh_host_ecdsa_key' }
   end
 
-  execute "ssh-keygen -f /opt/gonano/etc/ssh/ssh_host_ed25519_key -N '' -t ed25519" do
-    not_if { ::File.exists? '/opt/gonano/etc/ssh/ssh_host_ed25519_key' }
+  execute "ssh-keygen -f /opt/gomicro/etc/ssh/ssh_host_ed25519_key -N '' -t ed25519" do
+    not_if { ::File.exists? '/opt/gomicro/etc/ssh/ssh_host_ed25519_key' }
   end
 
 end
 
 if payload[:logvac_host]
   # Configure narc
-  template '/opt/gonano/etc/narc.conf' do
+  template '/opt/gomicro/etc/narc.conf' do
     variables ({
       uid: payload[:component][:uid],
       logvac: payload[:logvac_host]
@@ -66,9 +66,9 @@ if payload[:logvac_host]
     mode 0755
     content <<-EOF
   #!/bin/sh -e
-  export PATH="/opt/local/sbin:/opt/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/gonano/sbin:/opt/gonano/bin"
+  export PATH="/opt/local/sbin:/opt/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/gomicro/sbin:/opt/gomicro/bin"
 
-  exec /opt/gonano/bin/narcd /opt/gonano/etc/narc.conf
+  exec /opt/gomicro/bin/narcd /opt/gomicro/etc/narc.conf
     EOF
   end
 end
@@ -78,9 +78,9 @@ directory '/data/var/db/influxdb/data' do
   recursive true
 end
 
-# chown /data/var/db/influxdb for gonano
+# chown /data/var/db/influxdb for gomicro
 execute 'chown /data/var/db/influxdb' do
-  command 'chown -R gonano:gonano /data/var/db/influxdb'
+  command 'chown -R gomicro:gomicro /data/var/db/influxdb'
 end
 
 # ensure kapacitor data directory exists
@@ -88,9 +88,9 @@ directory '/data/var/lib/kapacitor' do
   recursive true
 end
 
-# chown /data/var/lib/kapacitor for gonano
+# chown /data/var/lib/kapacitor for gomicro
 execute 'chown /data/var/lib/kapacitor' do
-  command 'chown -R gonano:gonano /data/var/lib/kapacitor'
+  command 'chown -R gomicro:gomicro /data/var/lib/kapacitor'
 end
 
 # ensure the etc config directory exists
@@ -98,17 +98,17 @@ directory '/data/etc/influxdb' do
   recursive true
 end
 
-# chown data/var/db/influxdb for gonano
+# chown data/var/db/influxdb for gomicro
 execute 'chown /data/etc/influxdb' do
-  command 'chown -R gonano:gonano /data/etc/influxdb'
+  command 'chown -R gomicro:gomicro /data/etc/influxdb'
 end
 
 # generate the config file
 template '/data/etc/influxdb/influxdb.conf' do
   source 'influxdb.conf.erb'
   mode 0644
-  owner 'gonano'
-  group 'gonano'
+  owner 'gomicro'
+  group 'gomicro'
   variables ({
     config: config
   })
@@ -119,17 +119,17 @@ directory '/data/etc/kapacitor' do
   recursive true
 end
 
-# chown data/var/db/kapacitor for gonano
+# chown data/var/db/kapacitor for gomicro
 execute 'chown /data/etc/kapacitor' do
-  command 'chown -R gonano:gonano /data/etc/kapacitor'
+  command 'chown -R gomicro:gomicro /data/etc/kapacitor'
 end
 
 # generate the kapacitor config file
 template '/data/etc/kapacitor/kapacitor.conf' do
   source 'kapacitor.conf.erb'
   mode 0644
-  owner 'gonano'
-  group 'gonano'
+  owner 'gomicro'
+  group 'gomicro'
   variables ({
     config: config
   })
